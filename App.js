@@ -37,7 +37,7 @@ export default function App() {
   const [isTfReady, setIsTfReady] = useState(false);
   const [isModelReady, setIsModelReady] = useState(false);
   const [text, setText] = useState('');
-  const [prediction, setPrediction] = useState(null);
+  const [prediction, setPrediction] = useState([]);
 
   // will test here for the sentiment analysis
   useEffect(() => {
@@ -50,33 +50,59 @@ export default function App() {
     }
   });
 
-  // The minimum prediction confidence.
-  const threshold = 0.9;
+  // useEffect(() => {
+  //   // The minimum prediction confidence.
+  //   const threshold = 0.9;
 
-  // Load the model. Users optionally pass in a threshold and an array of
-  // labels to include.
+  //   // Load the model. Users optionally pass in a threshold and an array of
+  //   // labels to include.
+  //   try {
+  //     toxicity.load(threshold).then((model) => {
+  //       const textArray = new Array(text);
+  //       console.log('text array', textArray);
 
-  const result = async () => {
-    await toxicity.load(threshold).then((model) => {
-      // const sentences = ['you suck'];
+  //       model.classify(textArray).then((predictions) => {
+  //         // `predictions` is an array of objects, one for each prediction head,
+  //         // that contains the raw probabilities for each input along with the
+  //         // final prediction in `match` (either `true` or `false`).
+  //         // If neither prediction exceeds the threshold, `match` is `null`.
+  //         // const sentimentResult = predictions;
+  //         console.log('prediction: ', predictions);
+  //         // setPrediction(predictions);
+  //       });
+  //     });
+  //   } catch (error) {
+  //     console.log('could not predict', error);
+  //   }
+  // });
 
-      model.classify(text).then((predictions) => {
-        // `predictions` is an array of objects, one for each prediction head,
-        // that contains the raw probabilities for each input along with the
-        // final prediction in `match` (either `true` or `false`).
-        // If neither prediction exceeds the threshold, `match` is `null`.
-        const sentimentResult = predictions;
-        console.log('prediction: ', sentimentResult);
-        setPrediction(sentimentResult);
+  const result = ()=>{
+    alert('working');
+    const threshold = 0.9;
 
-        // const predictOut = model.predict(input);
-        // const score = predictOut.dataSync()[0];
-        // predictOut.dispose();
-        // setPrediction(score);
-        // return score;
+    // Load the model. Users optionally pass in a threshold and an array of
+    // labels to include.
+   console.log(text);
+  //  console.log('prediction: ', predictions);
+    try {
+      toxicity.load(threshold).then((model) => {
+        const textArray = new Array(text);
+        console.log('text array', textArray);
+
+        model.classify(textArray).then((predictions) => {
+          // `predictions` is an array of objects, one for each prediction head,
+          // that contains the raw probabilities for each input along with the
+          // final prediction in `match` (either `true` or `false`).
+          // If neither prediction exceeds the threshold, `match` is `null`.
+          // const sentimentResult = predictions;
+          console.log('prediction: ', predictions);
+          setPrediction(predictions);
+        });
       });
-    });
-  };
+    } catch (error) {
+      console.log('could not predict', error);
+    }
+  }
 
   return (
     <>
@@ -99,13 +125,11 @@ export default function App() {
           placeholder="Write your text here"
           onChangeText={(val) => {
             setText(val);
-            // const result = predictions;
-            // setPrediction(result);
           }}
           value={text}
         />
 
-        <TouchableOpacity onPress={result}>
+        <TouchableOpacity onPress={()=>{result()}}>
           <Text style={{color: '#ffffff', backgroundColor: '#ff0000'}}>Analyze</Text>
         </TouchableOpacity>
 

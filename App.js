@@ -15,6 +15,8 @@ import {
   Text,
   StatusBar,
   Settings,
+  Button,
+  TouchableOpacity,
 } from 'react-native';
 
 import {
@@ -31,32 +33,6 @@ import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 import * as toxicity from '@tensorflow-models/toxicity';
 
-// const App: () => React$Node = () => {
-
-// };
-
-// export class App extends React.Component {
-// constructor(props) {
-//     super(props);
-//     this.state = {
-//       isTfReady: false,
-//     };
-// }
-
-// async componentDidMount() {
-//     // Wait for tf to be ready.
-//     await tf.ready();
-//     // Signal to the app that tensorflow.js can now be used.
-//     this.setState({
-//       isTfReady: true,
-//     });
-// }
-
-// render() {
-//     //
-// }
-// }
-
 export default function App() {
   const [isTfReady, setIsTfReady] = useState(false);
   const [isModelReady, setIsModelReady] = useState(false);
@@ -70,15 +46,8 @@ export default function App() {
     // console.warn('tf is ready');
 
     {
-      toxicity.load()
-        ? setIsModelReady(true)
-        : '';
+      toxicity.load() ? setIsModelReady(true) : '';
     }
-
-    // if(model == toxicity.load()){
-    //   setIsModelReady(true);
-    //   console.warn('model is ready');
-    // }
   });
 
   // The minimum prediction confidence.
@@ -86,18 +55,28 @@ export default function App() {
 
   // Load the model. Users optionally pass in a threshold and an array of
   // labels to include.
-  toxicity.load(threshold).then((model) => {
-    // const sentences = ['you suck'];
 
-    model.classify(text).then((predictions) => {
-      // `predictions` is an array of objects, one for each prediction head,
-      // that contains the raw probabilities for each input along with the
-      // final prediction in `match` (either `true` or `false`).
-      // If neither prediction exceeds the threshold, `match` is `null`.
+  const result = async () => {
+    await toxicity.load(threshold).then((model) => {
+      // const sentences = ['you suck'];
 
-      console.log('prediction: ', predictions);
+      model.classify(text).then((predictions) => {
+        // `predictions` is an array of objects, one for each prediction head,
+        // that contains the raw probabilities for each input along with the
+        // final prediction in `match` (either `true` or `false`).
+        // If neither prediction exceeds the threshold, `match` is `null`.
+        const sentimentResult = predictions;
+        console.log('prediction: ', sentimentResult);
+        setPrediction(sentimentResult);
+
+        // const predictOut = model.predict(input);
+        // const score = predictOut.dataSync()[0];
+        // predictOut.dispose();
+        // setPrediction(score);
+        // return score;
+      });
     });
-  });
+  };
 
   return (
     <>
@@ -105,11 +84,7 @@ export default function App() {
         <Text>Sentiment Analysis</Text>
         <Text>
           TF ready?{' '}
-          {isTfReady ? (
-            <Text>Yes, TF loaded</Text>
-          ) : (
-            <Text>Loading TF...</Text>
-          )}
+          {isTfReady ? <Text>Yes, TF loaded</Text> : <Text>Loading TF...</Text>}
         </Text>
         <Text>
           Model ready?{' '}
@@ -124,9 +99,15 @@ export default function App() {
           placeholder="Write your text here"
           onChangeText={(val) => {
             setText(val);
-            setPrediction(val.predictions)
+            // const result = predictions;
+            // setPrediction(result);
           }}
+          value={text}
         />
+
+        <TouchableOpacity onPress={result}>
+          <Text style={{color: '#ffffff', backgroundColor: '#ff0000'}}>Analyze</Text>
+        </TouchableOpacity>
 
         <Text>Written Text: {text}</Text>
         <Text>Prediction: {prediction}</Text>
